@@ -54,16 +54,22 @@ def scattering2d(x, pad, unpad, backend, J, L, phi, psi, max_order,
         for n2 in range(len(psi)):
             j2 = psi[n2]['j']
             theta2 = psi[n2]['theta']
+            #print(j1,j2)
+            #if j2 <= j1:
+            #    continue
 
-            if j2 <= j1:
-                continue
+            k = 2**(j2-j1)
 
             U_2_c = cdgmm(U_1_c, psi[n2][j1])
-            U_2_c = subsample_fourier(U_2_c, k=2 ** (j2 - j1))
+            U_2_c = subsample_fourier(U_2_c, k=k)
+
             U_2_c = fft(U_2_c, 'C2C', inverse=True)
+
             U_2_c = modulus(U_2_c)
+
             U_2_c = fft(U_2_c, 'C2C')
 
+            #print(k, phi[j2].shape)
             # Third low pass filter
             S_2_c = cdgmm(U_2_c, phi[j2])
             S_2_c = subsample_fourier(S_2_c, k=2 ** (J - j2))

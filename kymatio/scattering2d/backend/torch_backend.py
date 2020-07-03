@@ -132,17 +132,33 @@ class SubsampleFourier(object):
 
         if not x.is_contiguous():
             raise RuntimeError('Input should be contiguous.')
-        batch_shape = x.shape[:-3]
-        signal_shape = x.shape[-3:]
-        x = x.view((-1,) + signal_shape)
-        y = x.view(-1,
-                       k, x.shape[1] // k,
-                       k, x.shape[2] // k,
-                       2)
 
-        out = y.mean(3, keepdim=False).mean(1, keepdim=False)
-        out = out.reshape(batch_shape + out.shape[-3:])
-        return out
+        if int(k) == k: # k is an integer
+
+            batch_shape = x.shape[:-3]
+            signal_shape = x.shape[-3:]
+            x = x.view((-1,) + signal_shape)
+            y = x.view(-1,
+                           k, x.shape[1] // k,
+                           k, x.shape[2] // k,
+                           2)
+
+            out = y.mean(3, keepdim=False).mean(1, keepdim=False)
+            out = out.reshape(batch_shape + out.shape[-3:])
+            return out
+        else: # k is the inverse of an integer
+            k = int(1./k)
+            #print('k', k)
+            batch_shape = x.shape[:-3]
+            signal_shape = x.shape[-3:]
+            x = x.view((-1,) + signal_shape)
+            #print('x', x.shape)
+            out = x.repeat(1, k,k,1)#.view 
+            #print('out', out.shape)
+
+            #out = y.mean(3, keepdim=False).mean(1, keepdim=False)
+            out = out.reshape(batch_shape + out.shape[-3:])
+            return out
 
 
 fft = FFT(lambda x: torch.fft(x, 2, normalized=False),

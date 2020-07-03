@@ -44,10 +44,13 @@ def filter_bank(M, N, J, L=8):
             psi_signal_fourier = fft2(psi_signal)
             # drop the imaginary part, it is zero anyway
             psi_signal_fourier = np.real(psi_signal_fourier)
-            for res in range(min(j + 1, max(J - 1, 1))):
+            #for res in range(min(j + 1, max(J - 1, 1))):
+            for res in range(J):
+                #print(res)
                 psi_signal_fourier_res = periodize_filter_fft(
                     psi_signal_fourier, res)
                 psi[res] = psi_signal_fourier_res
+            #print('*'*10)
             filters['psi'].append(psi)
 
     filters['phi'] = {}
